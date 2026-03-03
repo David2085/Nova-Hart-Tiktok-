@@ -2,30 +2,52 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Nova & Finn – TikTok Preview</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     background: #0a0a0a;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  body {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    font-family: 'DM Sans', sans-serif;
-    overflow: hidden;
   }
 
+  /* On desktop: show phone frame. On mobile: fill full screen */
   .phone {
-    width: 375px;
-    height: 812px;
-    background: #000;
-    border-radius: 50px;
-    box-shadow: 0 0 0 12px #1a1a1a, 0 0 0 14px #333, 0 40px 80px rgba(0,0,0,0.8);
     position: relative;
     overflow: hidden;
+    background: #000;
+
+    /* Desktop */
+    width: 375px;
+    height: 812px;
+    border-radius: 50px;
+    box-shadow: 0 0 0 12px #1a1a1a, 0 0 0 14px #333, 0 40px 80px rgba(0,0,0,0.8);
+  }
+
+  @media (max-width: 500px), (max-height: 820px) {
+    body {
+      align-items: stretch;
+      justify-content: stretch;
+    }
+    .phone {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .phone-notch { display: none; }
   }
 
   .phone-notch {
@@ -55,7 +77,7 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(to bottom,
-      rgba(0,0,0,0.2) 0%,
+      rgba(0,0,0,0.25) 0%,
       transparent 25%,
       transparent 45%,
       rgba(0,0,0,0.88) 100%);
@@ -63,35 +85,52 @@
     pointer-events: none;
   }
 
-  /* YouTube iframe fullscreen background */
+  /* YouTube fullscreen background */
   .yt-wrapper {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 177.78vh; /* 16:9 scaled to fill vertically */
+    width: 100%;
     height: 100%;
-    min-width: 100%;
-    min-height: 56.25vw;
     pointer-events: none;
   }
   .yt-wrapper iframe {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    top: 50%; left: 50%;
+    /* Scale up to cover the container regardless of aspect ratio */
+    width: 200%;
+    height: 200%;
+    transform: translate(-50%, -50%);
     border: none;
     pointer-events: none;
   }
 
-  /* Scene text overlay */
+  .yt-loading {
+    position: absolute;
+    inset: 0;
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.3);
+    font-size: 13px;
+    letter-spacing: 1px;
+    z-index: 0;
+  }
+
+  /* Scene text — sits above the bottom UI */
   .scene-overlay {
     position: absolute;
-    bottom: 80px;
+    bottom: 230px;
     left: 16px;
     right: 70px;
     z-index: 10;
   }
+
+  @media (max-height: 700px) {
+    .scene-overlay { bottom: 200px; }
+  }
+
   .scene-tag {
     display: inline-block;
     background: rgba(255,255,255,0.15);
@@ -108,13 +147,13 @@
   }
   .main-text {
     font-family: 'Playfair Display', serif;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     line-height: 1.2;
     text-shadow: 0 2px 20px rgba(0,0,0,0.7);
   }
   .sub-text {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 300;
     letter-spacing: 1px;
     margin-top: 5px;
@@ -134,6 +173,9 @@
     top: 44px; left: 0; right: 0;
     display: flex;
     justify-content: center;
+  }
+  @media (max-width: 500px) {
+    .top-bar { top: 52px; }
   }
   .top-bar-tabs { display: flex; gap: 20px; }
   .tab { color: rgba(255,255,255,0.6); font-size: 15px; }
@@ -156,55 +198,64 @@
   .sidebar {
     position: absolute;
     right: 12px;
-    bottom: 165px;
+    bottom: 160px;
     display: flex; flex-direction: column;
-    align-items: center; gap: 18px;
+    align-items: center; gap: 16px;
+  }
+  @media (max-height: 700px) {
+    .sidebar { gap: 12px; bottom: 140px; }
   }
   .sidebar-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
   .avatar {
-    width: 44px; height: 44px;
+    width: 42px; height: 42px;
     border-radius: 50%;
     border: 2px solid #fff;
     background: linear-gradient(135deg, #C9A84C, #FF6B47);
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
+    font-size: 17px;
     position: relative;
     margin-bottom: 4px;
   }
   .avatar-plus {
     position: absolute; bottom: -8px;
-    width: 18px; height: 18px;
+    width: 17px; height: 17px;
     background: #FF3B5C;
     border-radius: 50%;
     border: 2px solid #000;
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700; color: #fff;
+    font-size: 11px; font-weight: 700; color: #fff;
   }
   .icon-circle {
-    width: 40px; height: 40px;
+    width: 38px; height: 38px;
     border-radius: 50%;
     background: rgba(255,255,255,0.15);
     backdrop-filter: blur(4px);
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
+    font-size: 19px;
   }
   .icon-label { color: #fff; font-size: 10px; font-weight: 600; margin-top: 2px; }
 
   .bottom-info {
     position: absolute;
-    bottom: 105px;
+    bottom: 100px;
     left: 16px;
     right: 70px;
   }
+  @media (max-height: 700px) {
+    .bottom-info { bottom: 85px; }
+  }
   .username { color: #fff; font-weight: 700; font-size: 14px; margin-bottom: 3px; }
-  .caption { color: rgba(255,255,255,0.9); font-size: 12px; line-height: 1.4; margin-bottom: 5px; }
+  .caption { color: rgba(255,255,255,0.9); font-size: 12px; line-height: 1.4; margin-bottom: 4px; }
   .hashtags { color: #C9A84C; font-size: 11px; font-weight: 600; }
 
   .music-bar {
     position: absolute;
-    bottom: 70px; left: 16px; right: 16px;
+    bottom: 68px; left: 16px; right: 16px;
     display: flex; align-items: center; gap: 8px;
     color: rgba(255,255,255,0.8); font-size: 11px;
+  }
+  @media (max-height: 700px) {
+    .music-bar { bottom: 55px; }
   }
   .music-icon { animation: spin 4s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -216,6 +267,8 @@
     background: rgba(0,0,0,0.92);
     display: flex; align-items: center; justify-content: space-around;
     border-top: 1px solid rgba(255,255,255,0.12);
+    /* Safe area for iPhone notch at bottom */
+    padding-bottom: env(safe-area-inset-bottom);
   }
   .nav-item {
     display: flex; flex-direction: column; align-items: center; gap: 2px;
@@ -247,7 +300,7 @@
 
   .swipe-hint {
     position: absolute;
-    bottom: 68px; left: 50%;
+    bottom: 66px; left: 50%;
     transform: translateX(-50%);
     color: rgba(255,255,255,0.45);
     font-size: 10px; letter-spacing: 1px;
@@ -259,21 +312,10 @@
   @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:0.9} }
 
   .click-next {
-    position: absolute; inset: 0;
-    z-index: 15; cursor: pointer;
-  }
-
-  /* Loading placeholder */
-  .yt-loading {
     position: absolute;
-    inset: 0;
-    background: #111;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255,255,255,0.3);
-    font-size: 13px;
-    letter-spacing: 1px;
+    top: 0; left: 0; right: 0;
+    bottom: 58px; /* don't cover bottom nav */
+    z-index: 15; cursor: pointer;
   }
 </style>
 </head>
@@ -286,8 +328,7 @@
   <div class="scene active" id="scene-1">
     <div class="yt-loading">▶ laden...</div>
     <div class="yt-wrapper">
-      <iframe id="yt-1"
-        src="https://www.youtube.com/embed/VUgokzPKkuA?autoplay=1&mute=1&loop=1&playlist=VUgokzPKkuA&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+      <iframe src="https://www.youtube.com/embed/VUgokzPKkuA?autoplay=1&mute=1&loop=1&playlist=VUgokzPKkuA&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
         allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
     <div class="scene-overlay">
@@ -301,8 +342,7 @@
   <div class="scene" id="scene-2">
     <div class="yt-loading">▶ laden...</div>
     <div class="yt-wrapper">
-      <iframe id="yt-2"
-        src="https://www.youtube.com/embed/PAdQ6Vztt5Q?autoplay=1&mute=1&loop=1&playlist=PAdQ6Vztt5Q&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+      <iframe src="https://www.youtube.com/embed/PAdQ6Vztt5Q?autoplay=1&mute=1&loop=1&playlist=PAdQ6Vztt5Q&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
         allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
     <div class="scene-overlay">
@@ -316,8 +356,7 @@
   <div class="scene" id="scene-3">
     <div class="yt-loading">▶ laden...</div>
     <div class="yt-wrapper">
-      <iframe id="yt-3"
-        src="https://www.youtube.com/embed/E3mtXP0C8xw?autoplay=1&mute=1&loop=1&playlist=E3mtXP0C8xw&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+      <iframe src="https://www.youtube.com/embed/E3mtXP0C8xw?autoplay=1&mute=1&loop=1&playlist=E3mtXP0C8xw&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
         allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
     <div class="scene-overlay">
@@ -331,8 +370,7 @@
   <div class="scene" id="scene-4">
     <div class="yt-loading">▶ laden...</div>
     <div class="yt-wrapper">
-      <iframe id="yt-4"
-        src="https://www.youtube.com/embed/EYNZHjEjiRE?autoplay=1&mute=1&loop=1&playlist=EYNZHjEjiRE&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+      <iframe src="https://www.youtube.com/embed/EYNZHjEjiRE?autoplay=1&mute=1&loop=1&playlist=EYNZHjEjiRE&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
         allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
     <div class="scene-overlay">
@@ -346,8 +384,7 @@
   <div class="scene" id="scene-5">
     <div class="yt-loading">▶ laden...</div>
     <div class="yt-wrapper">
-      <iframe id="yt-5"
-        src="https://www.youtube.com/embed/9zBCVRl31WM?autoplay=1&mute=1&loop=1&playlist=9zBCVRl31WM&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+      <iframe src="https://www.youtube.com/embed/9zBCVRl31WM?autoplay=1&mute=1&loop=1&playlist=9zBCVRl31WM&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
         allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
     <div class="scene-overlay">
@@ -444,13 +481,20 @@
   });
 
   let touchStartY = 0;
+  let touchStartX = 0;
   document.getElementById('phone').addEventListener('touchstart', e => {
     touchStartY = e.touches[0].clientY;
-  });
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+
   document.getElementById('phone').addEventListener('touchend', e => {
-    const diff = touchStartY - e.changedTouches[0].clientY;
-    if (Math.abs(diff) > 40) goToScene(diff > 0 ? current + 1 : current - 1);
-  });
+    const diffY = touchStartY - e.changedTouches[0].clientY;
+    const diffX = Math.abs(touchStartX - e.changedTouches[0].clientX);
+    // Only swipe vertically, not horizontal
+    if (Math.abs(diffY) > 40 && diffX < 60) {
+      goToScene(diffY > 0 ? current + 1 : current - 1);
+    }
+  }, { passive: true });
 </script>
 </body>
 </html>
